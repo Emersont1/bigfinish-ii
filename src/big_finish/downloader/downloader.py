@@ -56,6 +56,7 @@ def main():
         Path(m_path).mkdir(parents=True, exist_ok=True)
         
         download_image(id, a_path)
+        download_image(id, m_path)
 
         for main in mains:
             path = download(s, main, a_path)
