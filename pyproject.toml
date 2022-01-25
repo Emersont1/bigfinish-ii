@@ -9,6 +9,8 @@ license = "MIT"
 python = "^3.8"
 requests = "^2.27.1"
 beautifulsoup4 = "^4.10.0"
+selenium = "^4.1.0"
+clint = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 pep8 = "^1.7.1"
