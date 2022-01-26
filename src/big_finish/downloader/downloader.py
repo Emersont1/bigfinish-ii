@@ -25,7 +25,7 @@ def download(session, url, path):
     if os.path.exists(f"{path}/{filename}"):
         if os.path.getsize(f"{path}/{filename}") == rsp.headers.get("Content-Length"):
             print(f"{filename} already exists, skipping")
-            return f"{path}/{filename}"
+            return f"{path}/{filename}", False
         else:
             print(f"{filename} exists but is incomplete, downloading again")
 
@@ -35,7 +35,7 @@ def download(session, url, path):
             if chunk:
                 f.write(chunk)
                 f.flush()
-    return f"{path}/{filename}"
+    return f"{path}/{filename}", True
 
 
 
@@ -68,9 +68,9 @@ def main():
         download_image(id, m_path)
 
         for main in mains:
-            path = download(s, main, a_path)
+            path, try_extract = download(s, main, a_path)
             # We want to extract the M4Bs only
-            if re.search(r'\.ab.\.zip$', path):
+            if re.search(r'\.ab.\.zip$', path) and try_extract:
                 print(f"Extracting M4B zip at {path}")
                 with ZipFile(path, 'r') as zipObj:
                     for f in zipObj.namelist():
