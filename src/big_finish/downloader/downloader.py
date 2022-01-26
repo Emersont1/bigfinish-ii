@@ -2,6 +2,7 @@ import imp
 import requests
 import re
 from zipfile import ZipFile
+import os
 
 import big_finish
 
@@ -20,6 +21,14 @@ def download(session, url, path):
     rsp = session.get(f"https://www.bigfinish.com/{url}", stream=True)
     cd = rsp.headers.get("Content-Disposition")
     filename = re.search(r'filename="(.+)"', cd).group(1)
+
+    if os.path.exists(f"{path}/{filename}"):
+        if os.path.getsize(f"{path}/{filename}") == rsp.headers.get("Content-Length"):
+            print(f"{filename} already exists, skipping")
+            return f"{path}/{filename}"
+        else:
+            print(f"{filename} exists but is incomplete, downloading again")
+
     with open(f"{path}/{filename}", "wb") as f:
         total_length = int(rsp.headers.get('content-length'))
         for chunk in progress.bar(rsp.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
@@ -76,7 +85,6 @@ def main():
         for supp in supps:
             Path(f"{a_path}/bonus").mkdir(parents=True, exist_ok=True)
             download(s, supp, f"{a_path}/bonus")
-        break
 
 
 if __name__ == "__main__":
