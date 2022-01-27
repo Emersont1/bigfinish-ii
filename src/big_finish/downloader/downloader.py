@@ -21,16 +21,16 @@ def download(session, url, path):
     rsp = session.get(f"https://www.bigfinish.com/{url}", stream=True)
     cd = rsp.headers.get("Content-Disposition")
     filename = re.search(r'filename="(.+)"', cd).group(1)
+    total_length = int(rsp.headers.get('content-length'))
 
     if os.path.exists(f"{path}/{filename}"):
-        if os.path.getsize(f"{path}/{filename}") == rsp.headers.get("Content-Length"):
+        if os.path.getsize(f"{path}/{filename}") == total_length:
             print(f"{filename} already exists, skipping")
             return f"{path}/{filename}", False
         else:
             print(f"{filename} exists but is incomplete, downloading again")
 
     with open(f"{path}/{filename}", "wb") as f:
-        total_length = int(rsp.headers.get('content-length'))
         for chunk in progress.bar(rsp.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
             if chunk:
                 f.write(chunk)
